@@ -1,0 +1,140 @@
+"""
+Threads auto-poster for @bylovemason.
+
+Runs every hour on GitHub Actions. If the current time matches one of the
+posting slots in config.json, it publishes the next post from queue.json
+through Meta's official Threads API, then moves it to posted.json.
+
+No extra packages needed: standard Python only.
+"""
+
+import json
+import os
+import random
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+API = os.environ.get("THREADS_API_BASE", "https://graph.threads.net/v1.0")
+HERE = os.path.dirname(os.path.abspath(__file__))
+QUEUE_FILE = os.path.join(HERE, "queue.json")
+POSTED_FILE = os.path.join(HERE, "posted.json")
+CONFIG_FILE = os.path.join(HERE, "config.json")
+MAX_CHARS = 500
+
+
+def load(path, default):
+    if not os.path.exists(path):
+        return default
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+
+def api_post(path, params):
+    data = urllib.parse.urlencode(params).encode()
+    req = urllib.request.Request(f"{API}/{path}", data=data, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode(errors="replace")
+        raise RuntimeError(f"Threads API error {e.code}: {body}") from None
+
+
+def due_slot(cfg, now, posted, today):
+    """Return the earliest posting slot that is due and not yet posted today.
+
+    A slot like '12:30' becomes due once the clock reaches its hour (12:xx).
+    GitHub sometimes runs scheduled jobs late, so a missed slot can still be
+    caught up for up to 3 hours. Older missed slots are skipped, so you never
+    get a burst of posts at once.
+    """
+    done = {p.get("slot") for p in posted if p.get("date") == today}
+    for slot in sorted(cfg["post_times"]):
+        if slot in done:
+            continue
+        h, m = map(int, slot.split(":"))
+        slot_hour = now.replace(hour=h, minute=0, second=0, microsecond=0)
+        if slot_hour <= now < slot_hour + timedelta(hours=3):
+            return slot
+    return None
+
+
+def main():
+    cfg = load(CONFIG_FILE, None)
+    if cfg is None:
+        sys.exit("config.json is missing.")
+    if cfg.get("paused"):
+        print("Posting is paused in config.json. Nothing to do.")
+        return
+
+    tz = ZoneInfo(cfg["timezone"])
+    now = datetime.now(tz)
+    force = os.environ.get("FORCE_POST") == "1"
+
+    today = now.strftime("%Y-%m-%d")
+    posted = load(POSTED_FILE, [])
+
+    slot = "manual" if force else due_slot(cfg, now, posted, today)
+    if slot is None:
+        print(f"{now:%Y-%m-%d %H:%M} {cfg['timezone']}: nothing due this hour.")
+        return
+
+    queue = load(QUEUE_FILE, [])
+    if not queue:
+        print("Queue is empty. Add posts to queue.json.")
+        return
+
+    token = os.environ.get("THREADS_TOKEN")
+    if not token:
+        sys.exit("THREADS_TOKEN secret is missing.")
+
+    item = queue[0]
+    text = item["text"] if isinstance(item, dict) else str(item)
+    text = text.strip()
+
+    if len(text) > MAX_CHARS:
+        print(f"Skipping a post over {MAX_CHARS} characters ({len(text)}): moved to the end of posted.json as 'too_long'.")
+        posted.append({"text": text, "status": "too_long", "date": today, "slot": slot})
+        save(POSTED_FILE, posted)
+        save(QUEUE_FILE, queue[1:])
+        return
+
+    # Small random delay so posts don't land at the exact same minute every day.
+    if not force:
+        delay = random.randint(0, int(cfg.get("max_random_delay_minutes", 5)) * 60)
+        print(f"Waiting {delay // 60}m {delay % 60}s before posting.")
+        time.sleep(delay)
+
+    container = api_post("me/threads", {"media_type": "TEXT", "text": text, "access_token": token})
+    # Meta recommends waiting about 30 seconds before publishing.
+    time.sleep(int(os.environ.get("PUBLISH_WAIT_SECONDS", "30")))
+    result = api_post("me/threads_publish", {"creation_id": container["id"], "access_token": token})
+
+    posted.append({
+        "text": text,
+        "status": "posted",
+        "threads_id": result.get("id"),
+        "date": today,
+        "slot": slot,
+        "posted_at": datetime.now(tz).isoformat(timespec="minutes"),
+    })
+    save(POSTED_FILE, posted)
+    save(QUEUE_FILE, queue[1:])
+    print(f"Posted (slot {slot}). {len(queue) - 1} posts left in the queue.")
+    if len(queue) - 1 <= 3:
+        print("::warning::Queue is almost empty. Ask Claude for the next batch.")
+
+
+if __name__ == "__main__":
+    main()
