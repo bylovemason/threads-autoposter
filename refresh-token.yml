@@ -1,0 +1,38 @@
+name: Refresh Threads token
+
+# Threads long-lived tokens last 60 days. This renews it every week
+# and saves the new one back into the THREADS_TOKEN secret.
+
+on:
+  schedule:
+    - cron: "41 3 * * 1"   # Mondays 03:41 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Refresh and save token
+        env:
+          OLD_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::GH_PAT secret is missing. See the setup guide, step 6."
+            exit 1
+          fi
+          RESP=$(curl -sS -G "https://graph.threads.net/refresh_access_token" \
+            --data-urlencode "grant_type=th_refresh_token" \
+            --data-urlencode "access_token=$OLD_TOKEN")
+          NEW=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+          if [ -z "$NEW" ]; then
+            echo "::error::Token refresh failed. Generate a new token (setup guide, step 3) and paste it into THREADS_TOKEN."
+            echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('error', d))"
+            exit 1
+          fi
+          echo "::add-mask::$NEW"
+          gh secret set THREADS_TOKEN --repo "$REPO" --body "$NEW"
+          echo "Token refreshed for another 60 days."
