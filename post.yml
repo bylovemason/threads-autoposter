@@ -1,0 +1,47 @@
+name: Post to Threads
+
+on:
+  schedule:
+    # Every hour at minute 17. The script decides whether a post is due.
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Post the next queued post right now (yes/no)"
+        default: "no"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: threads-poster
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Publish next post if one is due
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          FORCE_POST: ${{ github.event.inputs.force == 'yes' && '1' || '0' }}
+        run: python post.py
+
+      - name: Save queue changes
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain queue.json posted.json)" ]; then
+            git config user.name "threads-autoposter"
+            git config user.email "actions@users.noreply.github.com"
+            git add queue.json posted.json
+            git commit -m "Posted to Threads"
+            git pull --rebase
+            git push
+          fi
