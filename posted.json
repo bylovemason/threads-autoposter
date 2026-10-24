@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "text": "Test post from my auto-poster. If you're reading this, it works.",
+    "status": "posted",
+    "threads_id": "18116819231034689",
+    "date": "2026-10-24",
+    "slot": "manual",
+    "posted_at": "2026-10-24T12:15-04:00"
+  }
+]
