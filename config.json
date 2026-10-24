@@ -1,6 +1,8 @@
 {
   "timezone": "America/New_York",
-  "post_times": ["08:00", "12:30", "19:00"],
+  "post_times": [
+    "08:30"
+  ],
   "max_random_delay_minutes": 5,
   "paused": false
 }

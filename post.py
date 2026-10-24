@@ -100,12 +100,17 @@ def main():
         sys.exit("THREADS_TOKEN secret is missing.")
 
     item = queue[0]
-    text = item["text"] if isinstance(item, dict) else str(item)
-    text = text.strip()
+    # A queue item is either a single post {"text": "..."} or a long-form
+    # thread {"thread": ["hook post", "post 2", ..., "CTA post"]}.
+    if isinstance(item, dict) and "thread" in item:
+        parts = [str(p).strip() for p in item["thread"] if str(p).strip()]
+    else:
+        parts = [(item["text"] if isinstance(item, dict) else str(item)).strip()]
 
-    if len(text) > MAX_CHARS:
-        print(f"Skipping a post over {MAX_CHARS} characters ({len(text)}): moved to the end of posted.json as 'too_long'.")
-        posted.append({"text": text, "status": "too_long", "date": today, "slot": slot})
+    too_long = [i + 1 for i, p in enumerate(parts) if len(p) > MAX_CHARS]
+    if not parts or too_long:
+        print(f"Skipping this item: post(s) {too_long} are over {MAX_CHARS} characters. Moved to posted.json as 'too_long'.")
+        posted.append({"parts": parts, "status": "too_long", "date": today, "slot": slot})
         save(POSTED_FILE, posted)
         save(QUEUE_FILE, queue[1:])
         return
@@ -116,22 +121,43 @@ def main():
         print(f"Waiting {delay // 60}m {delay % 60}s before posting.")
         time.sleep(delay)
 
-    container = api_post("me/threads", {"media_type": "TEXT", "text": text, "access_token": token})
-    # Meta recommends waiting about 30 seconds before publishing.
-    time.sleep(int(os.environ.get("PUBLISH_WAIT_SECONDS", "30")))
-    result = api_post("me/threads_publish", {"creation_id": container["id"], "access_token": token})
+    wait = int(os.environ.get("PUBLISH_WAIT_SECONDS", "30"))
+    ids = []
+    error = None
+    for i, text in enumerate(parts):
+        params = {"media_type": "TEXT", "text": text, "access_token": token}
+        if ids:
+            params["reply_to_id"] = ids[-1]  # chain each part under the previous one
+        try:
+            container = api_post("me/threads", params)
+            # Meta recommends waiting about 30 seconds before publishing.
+            time.sleep(wait)
+            result = api_post("me/threads_publish", {"creation_id": container["id"], "access_token": token})
+            ids.append(result.get("id"))
+            print(f"Published part {i + 1}/{len(parts)}.")
+        except RuntimeError as e:
+            error = str(e)
+            break
+
+    if error and not ids:
+        # Nothing went live: leave the item in the queue so the next run retries it.
+        sys.exit(error)
 
     posted.append({
-        "text": text,
-        "status": "posted",
-        "threads_id": result.get("id"),
+        "parts": parts,
+        "status": "posted" if not error else f"partial ({len(ids)}/{len(parts)} published)",
+        "threads_ids": ids,
         "date": today,
         "slot": slot,
         "posted_at": datetime.now(tz).isoformat(timespec="minutes"),
     })
     save(POSTED_FILE, posted)
     save(QUEUE_FILE, queue[1:])
-    print(f"Posted (slot {slot}). {len(queue) - 1} posts left in the queue.")
+    if error:
+        # Some parts are live: never repost them. Record it and alert by failing the run.
+        print(f"::error::Thread only partly published ({len(ids)}/{len(parts)}). {error}")
+        sys.exit(1)
+    print(f"Posted (slot {slot}). {len(queue) - 1} items left in the queue.")
     if len(queue) - 1 <= 3:
         print("::warning::Queue is almost empty. Ask Claude for the next batch.")
 
