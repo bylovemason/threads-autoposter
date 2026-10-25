@@ -1,9 +1,10 @@
 """
 Threads auto-poster for @bylovemason.
 
-Runs every hour on GitHub Actions. If the current time matches one of the
-posting slots in config.json, it publishes the next post from queue.json
-through Meta's official Threads API, then moves it to posted.json.
+Runs every hour on GitHub Actions. Each item in queue.json carries its own
+"at" time (New York time by default, set in config.json). When that time has
+passed, the item is published through Meta's official Threads API and moved
+to posted.json. Items without an "at" time fall back to config post_times.
 
 No extra packages needed: standard Python only.
 """
@@ -84,22 +85,45 @@ def main():
 
     today = now.strftime("%Y-%m-%d")
     posted = load(POSTED_FILE, [])
-
-    slot = "manual" if force else due_slot(cfg, now, posted, today)
-    if slot is None:
-        print(f"{now:%Y-%m-%d %H:%M} {cfg['timezone']}: nothing due this hour.")
-        return
-
     queue = load(QUEUE_FILE, [])
     if not queue:
         print("Queue is empty. Add posts to queue.json.")
+        return
+
+    # Items with an "at" time ("YYYY-MM-DD HH:MM", in config timezone) post at
+    # that exact time. Items without one fall back to the post_times slots.
+    def at_time(it):
+        if isinstance(it, dict) and it.get("at"):
+            return datetime.strptime(it["at"], "%Y-%m-%d %H:%M").replace(tzinfo=tz)
+        return None
+
+    idx, slot = None, None
+    if force:
+        idx, slot = 0, "manual"
+    else:
+        due = [(at_time(it), i) for i, it in enumerate(queue) if at_time(it) and at_time(it) <= now]
+        if due:
+            # Earliest overdue item first. One item per run, so a missed hour
+            # catches up gradually instead of bursting.
+            t, idx = min(due)
+            slot = queue[idx]["at"]
+        else:
+            undated = [i for i, it in enumerate(queue) if not at_time(it)]
+            if undated:
+                slot = due_slot(cfg, now, posted, today)
+                idx = undated[0] if slot else None
+    if idx is None:
+        nxt = min((at_time(it) for it in queue if at_time(it)), default=None)
+        print(f"{now:%Y-%m-%d %H:%M} {cfg['timezone']}: nothing due."
+              + (f" Next post at {nxt:%Y-%m-%d %H:%M}." if nxt else ""))
         return
 
     token = os.environ.get("THREADS_TOKEN")
     if not token:
         sys.exit("THREADS_TOKEN secret is missing.")
 
-    item = queue[0]
+    item = queue[idx]
+    remaining = queue[:idx] + queue[idx + 1:]
     # A queue item is either a single post {"text": "..."} or a long-form
     # thread {"thread": ["hook post", "post 2", ..., "CTA post"]}.
     if isinstance(item, dict) and "thread" in item:
@@ -112,7 +136,7 @@ def main():
         print(f"Skipping this item: post(s) {too_long} are over {MAX_CHARS} characters. Moved to posted.json as 'too_long'.")
         posted.append({"parts": parts, "status": "too_long", "date": today, "slot": slot})
         save(POSTED_FILE, posted)
-        save(QUEUE_FILE, queue[1:])
+        save(QUEUE_FILE, remaining)
         return
 
     # Small random delay so posts don't land at the exact same minute every day.
@@ -152,13 +176,13 @@ def main():
         "posted_at": datetime.now(tz).isoformat(timespec="minutes"),
     })
     save(POSTED_FILE, posted)
-    save(QUEUE_FILE, queue[1:])
+    save(QUEUE_FILE, remaining)
     if error:
         # Some parts are live: never repost them. Record it and alert by failing the run.
         print(f"::error::Thread only partly published ({len(ids)}/{len(parts)}). {error}")
         sys.exit(1)
-    print(f"Posted (slot {slot}). {len(queue) - 1} items left in the queue.")
-    if len(queue) - 1 <= 3:
+    print(f"Posted (slot {slot}). {len(remaining)} items left in the queue.")
+    if len(remaining) <= 10:
         print("::warning::Queue is almost empty. Ask Claude for the next batch.")
 
 

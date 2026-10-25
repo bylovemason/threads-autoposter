@@ -2,8 +2,9 @@ name: Post to Threads
 
 on:
   schedule:
-    # Every hour at minute 17. The script decides whether a post is due.
-    - cron: "17 * * * *"
+    # Every hour at :17 during US waking hours only (11:00-02:59 UTC),
+    # which covers 7am-9pm New York time before and after the Nov 1 clock change.
+    - cron: "17 0-2,11-23 * * *"
   workflow_dispatch:
     inputs:
       force:

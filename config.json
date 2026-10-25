@@ -3,6 +3,6 @@
   "post_times": [
     "08:30"
   ],
-  "max_random_delay_minutes": 5,
+  "max_random_delay_minutes": 2,
   "paused": false
 }
