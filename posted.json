@@ -320,5 +320,17 @@
     "date": "2026-10-27",
     "slot": "2026-10-27 13:00",
     "posted_at": "2026-10-27T13:06-04:00"
+  },
+  {
+    "parts": [
+      "A promotion is a bigger desk in the same building."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18026550002875592"
+    ],
+    "date": "2026-10-27",
+    "slot": "2026-10-27 15:00",
+    "posted_at": "2026-10-27T15:04-04:00"
   }
 ]
