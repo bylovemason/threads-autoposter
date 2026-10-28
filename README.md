@@ -1,5 +1,7 @@
 # Threads auto-poster (@bylovemason)
 
+> LinkedIn poster lives in the `linkedin/` folder of this same repo. Setup: [linkedin/README.md](linkedin/README.md).
+
 Free. Posts to Threads through Meta's official API, from GitHub's free servers, even when your laptop is off.
 
 ## How it works

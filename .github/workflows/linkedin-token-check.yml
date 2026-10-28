@@ -1,0 +1,44 @@
+name: LinkedIn token check
+
+# LinkedIn tokens for personal apps last 60 days and can't renew themselves.
+# Every Monday this checks the token still works and fails (GitHub emails you)
+# once it is 50+ days old, so you get 10 days' warning to make a new one.
+
+on:
+  schedule:
+    - cron: "11 4 * * 1"   # Mondays 04:11 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check token
+        env:
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, urllib.request, urllib.error
+          from datetime import date
+          cfg = json.load(open("linkedin/config.json"))
+          tok = os.environ.get("LINKEDIN_TOKEN", "")
+          if not tok:
+              sys.exit("::error::LINKEDIN_TOKEN secret is missing. See linkedin/README.md, step 4.")
+          req = urllib.request.Request("https://api.linkedin.com/v2/userinfo",
+                                       headers={"Authorization": f"Bearer {tok}"})
+          try:
+              urllib.request.urlopen(req, timeout=30)
+          except urllib.error.HTTPError as e:
+              if e.code == 401:
+                  sys.exit("::error::LinkedIn token has expired. Make a new one: linkedin/README.md, step 3.")
+              print(f"::warning::userinfo returned {e.code}; token may lack openid/profile scopes.")
+          made = cfg.get("token_created")
+          if made:
+              age = (date.today() - date.fromisoformat(made)).days
+              print(f"Token is {age} days old (expires around day 60).")
+              if age >= 50:
+                  sys.exit(f"::error::LinkedIn token is {age} days old and dies at 60. Make a new one now: linkedin/README.md, step 3.")
+          print("LinkedIn token OK.")
+          PY

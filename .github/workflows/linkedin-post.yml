@@ -1,0 +1,48 @@
+name: Post to LinkedIn
+
+on:
+  schedule:
+    # Every hour at :23 during US waking hours (11:00-02:59 UTC = about 7am-9pm New York).
+    - cron: "23 0-2,11-23 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Post the next queued LinkedIn post right now (yes/no)"
+        default: "no"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linkedin-poster
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Publish next LinkedIn post if one is due
+        env:
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          FORCE_POST: ${{ github.event.inputs.force == 'yes' && '1' || '0' }}
+        run: python linkedin/post.py
+
+      - name: Save queue changes
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain linkedin/queue.json linkedin/posted.json)" ]; then
+            git config user.name "linkedin-autoposter"
+            git config user.email "actions@users.noreply.github.com"
+            git add linkedin/queue.json linkedin/posted.json
+            git commit -m "Posted to LinkedIn"
+            git pull --rebase
+            git push
+          fi
