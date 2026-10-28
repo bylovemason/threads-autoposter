@@ -368,5 +368,17 @@
     "date": "2026-10-27",
     "slot": "2026-10-27 19:00",
     "posted_at": "2026-10-27T19:53-04:00"
+  },
+  {
+    "parts": [
+      "Your job gets 8 hours a day.\n\nWhat you do with the other few decides whether you're still there in 2028."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18110755343236151"
+    ],
+    "date": "2026-10-27",
+    "slot": "2026-10-27 21:00",
+    "posted_at": "2026-10-27T21:24-04:00"
   }
 ]
