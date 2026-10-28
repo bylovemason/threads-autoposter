@@ -482,5 +482,17 @@
     "date": "2026-10-28",
     "slot": "2026-10-28 13:00",
     "posted_at": "2026-10-28T14:03-04:00"
+  },
+  {
+    "parts": [
+      "AI doesn't need to be better than you.\n\nIt just needs to be cheaper."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18196829014400025"
+    ],
+    "date": "2026-10-28",
+    "slot": "2026-10-28 15:00",
+    "posted_at": "2026-10-28T15:12-04:00"
   }
 ]
