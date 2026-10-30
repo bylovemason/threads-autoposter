@@ -774,5 +774,17 @@
     "date": "2026-10-30",
     "slot": "2026-10-30 11:00",
     "posted_at": "2026-10-30T12:08-04:00"
+  },
+  {
+    "parts": [
+      "You've been paid to learn for 5+ years.\n\nNow get paid for what you learned."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17988123839886958"
+    ],
+    "date": "2026-10-30",
+    "slot": "2026-10-30 12:00",
+    "posted_at": "2026-10-30T13:04-04:00"
   }
 ]
