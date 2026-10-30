@@ -694,5 +694,17 @@
     "date": "2026-10-29",
     "slot": "2026-10-29 19:00",
     "posted_at": "2026-10-29T19:56-04:00"
+  },
+  {
+    "parts": [
+      "If your job disappeared tomorrow, what would you sell?\n\nIf you don't have an answer, that's the work."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18075825032773675"
+    ],
+    "date": "2026-10-29",
+    "slot": "2026-10-29 21:00",
+    "posted_at": "2026-10-29T21:24-04:00"
   }
 ]
