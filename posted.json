@@ -950,5 +950,17 @@
     "date": "2026-10-31",
     "slot": "2026-10-31 11:00",
     "posted_at": "2026-10-31T11:55-04:00"
+  },
+  {
+    "parts": [
+      "You're not afraid of starting a business.\n\nYou're afraid of failing at one more."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18059050775572318"
+    ],
+    "date": "2026-10-31",
+    "slot": "2026-10-31 12:00",
+    "posted_at": "2026-10-31T12:57-04:00"
   }
 ]
