@@ -980,5 +980,17 @@
     "date": "2026-10-31",
     "slot": "2026-10-31 13:00",
     "posted_at": "2026-10-31T13:53-04:00"
+  },
+  {
+    "parts": [
+      "Your career is a resource.\n\nYour job is just one way to spend it."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17912505786519570"
+    ],
+    "date": "2026-10-31",
+    "slot": "2026-10-31 15:00",
+    "posted_at": "2026-10-31T15:05-04:00"
   }
 ]
