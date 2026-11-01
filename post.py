@@ -186,5 +186,24 @@ def main():
         print("::warning::Queue is almost empty. Ask Claude for the next batch.")
 
 
+def overdue_count(minutes):
+    """How many dated queue items are at least `minutes` past their time."""
+    cfg = load(CONFIG_FILE, {}) or {}
+    tz = ZoneInfo(cfg.get("timezone", "America/New_York"))
+    cutoff = datetime.now(tz) - timedelta(minutes=minutes)
+    n = 0
+    for it in load(QUEUE_FILE, []):
+        if isinstance(it, dict) and it.get("at"):
+            if datetime.strptime(it["at"], "%Y-%m-%d %H:%M").replace(tzinfo=tz) <= cutoff:
+                n += 1
+    return n
+
+
 if __name__ == "__main__":
+    before = len(load(POSTED_FILE, []))
     main()
+    # GitHub sometimes starts scheduled runs late or skips one. If we just posted and
+    # another item is already 25+ minutes overdue, post one more now so the day catches up.
+    if os.environ.get("FORCE_POST") != "1" and len(load(POSTED_FILE, [])) > before and overdue_count(25):
+        print("Catching up: posting one more overdue item.")
+        main()
