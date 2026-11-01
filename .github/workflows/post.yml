@@ -2,9 +2,9 @@ name: Post to Threads
 
 on:
   schedule:
-    # Every 30 minutes (at :17 and :47) from 11:00 to 03:59 UTC,
-    # which covers 6am-10:59pm New York time. The script decides what is due.
-    - cron: "17,47 0-3,11-23 * * *"
+    # Every 30 minutes (at :17 and :47) from 15:00 to 04:59 UTC,
+    # which covers 10am-11:59pm New York time (US only; Asia is asleep).
+    - cron: "17,47 0-4,15-23 * * *"
   workflow_dispatch:
     inputs:
       force:
