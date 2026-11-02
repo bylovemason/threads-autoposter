@@ -1,10 +1,5 @@
 [
   {
-    "at": "2026-11-02 11:00",
-    "kind": "SHORT",
-    "text": "Monday reminder:\n\nYour boss already has a plan for the next 5 years.\n\nDo you?"
-  },
-  {
     "at": "2026-11-02 11:30",
     "kind": "LONG",
     "thread": [
