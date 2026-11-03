@@ -41,6 +41,33 @@ def save(path, data):
         f.write("\n")
 
 
+MEDIA_BASE = os.environ.get(
+    "MEDIA_BASE", "https://raw.githubusercontent.com/bylovemason/threads-autoposter/main/")
+
+
+def api_get(path, params):
+    req = urllib.request.Request(f"{API}/{path}?" + urllib.parse.urlencode(params))
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Threads API error {e.code}: {e.read().decode(errors='replace')}") from None
+
+
+def wait_until_ready(container_id, token, limit=600):
+    """Videos (and sometimes images) need processing before they can be published."""
+    waited = 0
+    while waited < limit:
+        st = api_get(container_id, {"fields": "status,error_message", "access_token": token})
+        if st.get("status") == "FINISHED":
+            return
+        if st.get("status") in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"Media processing failed: {st}")
+        time.sleep(10)
+        waited += 10
+    raise RuntimeError("Media took too long to process.")
+
+
 def api_post(path, params):
     data = urllib.parse.urlencode(params).encode()
     req = urllib.request.Request(f"{API}/{path}", data=data, method="POST")
@@ -150,10 +177,18 @@ def main():
     error = None
     for i, text in enumerate(parts):
         params = {"media_type": "TEXT", "text": text, "access_token": token}
+        # Optional photo or video on the first post: {"image": "media/x.jpg"} or {"video": "media/x.mp4"}
+        if i == 0 and isinstance(item, dict) and (item.get("image") or item.get("video")):
+            if item.get("image"):
+                params.update(media_type="IMAGE", image_url=MEDIA_BASE + item["image"])
+            else:
+                params.update(media_type="VIDEO", video_url=MEDIA_BASE + item["video"])
         if ids:
             params["reply_to_id"] = ids[-1]  # chain each part under the previous one
         try:
             container = api_post("me/threads", params)
+            if params["media_type"] != "TEXT":
+                wait_until_ready(container["id"], token)
             # Meta recommends waiting about 30 seconds before publishing.
             time.sleep(wait)
             result = api_post("me/threads_publish", {"creation_id": container["id"], "access_token": token})
