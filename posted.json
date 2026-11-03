@@ -1426,5 +1426,17 @@
     "date": "2026-11-02",
     "slot": "2026-11-02 18:30",
     "posted_at": "2026-11-02T19:17-05:00"
+  },
+  {
+    "parts": [
+      "Your coworkers aren't your competition.\n\nAI is."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18171516877496465"
+    ],
+    "date": "2026-11-02",
+    "slot": "2026-11-02 19:00",
+    "posted_at": "2026-11-02T20:13-05:00"
   }
 ]
