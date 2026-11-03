@@ -45,6 +45,11 @@ MEDIA_BASE = os.environ.get(
     "MEDIA_BASE", "https://raw.githubusercontent.com/bylovemason/threads-autoposter/main/")
 
 
+def media_url(path):
+    """A full https:// link is used as-is; otherwise it's a file in this repo."""
+    return path if path.startswith("http") else MEDIA_BASE + path
+
+
 def api_get(path, params):
     req = urllib.request.Request(f"{API}/{path}?" + urllib.parse.urlencode(params))
     try:
@@ -180,9 +185,9 @@ def main():
         # Optional photo or video on the first post: {"image": "media/x.jpg"} or {"video": "media/x.mp4"}
         if i == 0 and isinstance(item, dict) and (item.get("image") or item.get("video")):
             if item.get("image"):
-                params.update(media_type="IMAGE", image_url=MEDIA_BASE + item["image"])
+                params.update(media_type="IMAGE", image_url=media_url(item["image"]))
             else:
-                params.update(media_type="VIDEO", video_url=MEDIA_BASE + item["video"])
+                params.update(media_type="VIDEO", video_url=media_url(item["video"]))
         if ids:
             params["reply_to_id"] = ids[-1]  # chain each part under the previous one
         try:
@@ -199,7 +204,17 @@ def main():
             break
 
     if error and not ids:
-        # Nothing went live: leave the item in the queue so the next run retries it.
+        # Nothing went live. Retry next run, but give up on an item after 3 failed tries
+        # so one bad photo/video can never block every post behind it.
+        item["attempts"] = item.get("attempts", 0) + 1 if isinstance(item, dict) else 1
+        if item["attempts"] >= 3:
+            posted.append({"parts": parts, "status": f"failed after 3 tries: {error[:300]}",
+                           "date": today, "slot": slot})
+            save(POSTED_FILE, posted)
+            save(QUEUE_FILE, remaining)
+            print(f"::error::Gave up on {slot} after 3 tries. {error}")
+        else:
+            save(QUEUE_FILE, remaining[:idx] + [item] + remaining[idx:])
         sys.exit(error)
 
     posted.append({
