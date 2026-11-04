@@ -1,0 +1,10 @@
+name: Read post stats
+on: workflow_dispatch
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python stats.py
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
