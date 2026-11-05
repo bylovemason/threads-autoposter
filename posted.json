@@ -2080,5 +2080,17 @@
     "date": "2026-11-04",
     "slot": "2026-11-04 22:00",
     "posted_at": "2026-11-04T23:03-05:00"
+  },
+  {
+    "parts": [
+      "Everyone has an unfair advantage.\n\nMost people spend their lives buying someone else's."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18078541457447699"
+    ],
+    "date": "2026-11-05",
+    "slot": "2026-11-04 23:00",
+    "posted_at": "2026-11-05T00:05-05:00"
   }
 ]
