@@ -2092,5 +2092,16 @@
     "date": "2026-11-05",
     "slot": "2026-11-04 23:00",
     "posted_at": "2026-11-05T00:05-05:00"
+  },
+  {
+    "parts": [
+      "Influencers sell attention.\nEducators sell information.\nUnfair Educators sell their rare combination."
+    ],
+    "status": "posted",
+    "threads_ids": [],
+    "date": "2026-11-05",
+    "slot": "2026-11-05 11:00",
+    "posted_at": "2026-11-05T11:05-05:00",
+    "note": "live; queue save failed on GitHub side, fixed by hand"
   }
 ]
