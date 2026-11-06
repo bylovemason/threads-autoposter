@@ -2349,5 +2349,17 @@
     "date": "2026-11-05",
     "slot": "2026-11-05 20:00",
     "posted_at": "2026-11-05T20:56-05:00"
+  },
+  {
+    "parts": [
+      "Most people don't need more information.\n\nThey need someone who's already done it."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18118137545114083"
+    ],
+    "date": "2026-11-05",
+    "slot": "2026-11-05 21:00",
+    "posted_at": "2026-11-05T21:56-05:00"
   }
 ]
