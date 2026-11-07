@@ -2821,5 +2821,17 @@
     "date": "2026-11-07",
     "slot": "2026-11-07 15:00",
     "posted_at": "2026-11-07T15:49-05:00"
+  },
+  {
+    "parts": [
+      "You don't need a new skill.\n\nYou need a new lens on the ones you have."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18119160860010911"
+    ],
+    "date": "2026-11-07",
+    "slot": "2026-11-07 15:30",
+    "posted_at": "2026-11-07T16:17-05:00"
   }
 ]
