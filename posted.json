@@ -2615,5 +2615,17 @@
     "date": "2026-11-06",
     "slot": "2026-11-06 18:30",
     "posted_at": "2026-11-06T19:19-05:00"
+  },
+  {
+    "parts": [
+      "Your job pays your bills.\n\nYour business pays your freedom."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17980920590916750"
+    ],
+    "date": "2026-11-06",
+    "slot": "2026-11-06 19:00",
+    "posted_at": "2026-11-06T20:14-05:00"
   }
 ]
