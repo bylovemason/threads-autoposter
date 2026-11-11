@@ -3303,5 +3303,17 @@
     "date": "2026-11-11",
     "slot": "2026-11-11 11:30",
     "posted_at": "2026-11-11T12:04-05:00"
+  },
+  {
+    "parts": [
+      "Anyone can learn a skill in 30 days.\n\nNobody can copy 7 years of living it."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18109204202570701"
+    ],
+    "date": "2026-11-11",
+    "slot": "2026-11-11 13:00",
+    "posted_at": "2026-11-11T14:02-05:00"
   }
 ]
