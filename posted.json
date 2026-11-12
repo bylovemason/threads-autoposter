@@ -3367,5 +3367,17 @@
     "date": "2026-11-11",
     "slot": "2026-11-11 19:30",
     "posted_at": "2026-11-11T19:36-05:00"
+  },
+  {
+    "parts": [
+      "Your coworkers come to you for answers every day.\n\nYou've been running a free course for years."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18109620227371823"
+    ],
+    "date": "2026-11-11",
+    "slot": "2026-11-11 21:30",
+    "posted_at": "2026-11-11T21:57-05:00"
   }
 ]
