@@ -3399,5 +3399,17 @@
     "date": "2026-11-12",
     "slot": "2026-11-12 11:30",
     "posted_at": "2026-11-12T12:12-05:00"
+  },
+  {
+    "parts": [
+      "Gurus teach what sells.\n\nUnfair Educators teach what they've lived.\n\nOnly one of them lasts."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18141017911712252"
+    ],
+    "date": "2026-11-12",
+    "slot": "2026-11-12 13:00",
+    "posted_at": "2026-11-12T14:00-05:00"
   }
 ]
