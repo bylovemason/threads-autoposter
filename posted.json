@@ -3495,5 +3495,17 @@
     "date": "2026-11-13",
     "slot": "2026-11-13 11:30",
     "posted_at": "2026-11-13T12:02-05:00"
+  },
+  {
+    "parts": [
+      "Look at what people ask you for help with.\n\nAt work and outside it.\n\nThat's your business, hiding in plain sight."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18071640608602094"
+    ],
+    "date": "2026-11-13",
+    "slot": "2026-11-13 13:00",
+    "posted_at": "2026-11-13T14:00-05:00"
   }
 ]
