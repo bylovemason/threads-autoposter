@@ -3557,5 +3557,17 @@
     "date": "2026-11-13",
     "slot": "2026-11-13 19:30",
     "posted_at": "2026-11-13T20:49-05:00"
+  },
+  {
+    "parts": [
+      "Your boss pays you for your experience once.\n\nA product pays you for it every time someone buys."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18132976417701834"
+    ],
+    "date": "2026-11-13",
+    "slot": "2026-11-13 21:30",
+    "posted_at": "2026-11-13T22:29-05:00"
   }
 ]
