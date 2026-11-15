@@ -3651,5 +3651,17 @@
     "date": "2026-11-14",
     "slot": "2026-11-14 19:30",
     "posted_at": "2026-11-14T20:20-05:00"
+  },
+  {
+    "parts": [
+      "Nobody needs more information.\n\nThey need someone who's already been where they are."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18415601680089659"
+    ],
+    "date": "2026-11-14",
+    "slot": "2026-11-14 21:30",
+    "posted_at": "2026-11-14T22:01-05:00"
   }
 ]
