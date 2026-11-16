@@ -3805,5 +3805,17 @@
     "date": "2026-11-16",
     "slot": "2026-11-16 15:00",
     "posted_at": "2026-11-16T15:32-05:00"
+  },
+  {
+    "parts": [
+      "You have an unfair advantage.\n\nYou've just spent years using it to build someone else's business."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17956508991338663"
+    ],
+    "date": "2026-11-16",
+    "slot": "2026-11-16 17:00",
+    "posted_at": "2026-11-16T17:29-05:00"
   }
 ]
