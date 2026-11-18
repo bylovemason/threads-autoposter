@@ -3993,5 +3993,17 @@
     "date": "2026-11-18",
     "slot": "2026-11-18 14:00",
     "posted_at": "2026-11-18T14:03-05:00"
+  },
+  {
+    "parts": [
+      "Your company has a 2027 plan.\n\nIt doesn't include you getting out.\n\nMake your own."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18123781987952114"
+    ],
+    "date": "2026-11-18",
+    "slot": "2026-11-18 15:30",
+    "posted_at": "2026-11-18T16:01-05:00"
   }
 ]
