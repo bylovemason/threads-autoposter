@@ -4199,5 +4199,17 @@
     "date": "2026-11-20",
     "slot": "2026-11-20 11:00",
     "posted_at": "2026-11-20T11:06-05:00"
+  },
+  {
+    "parts": [
+      "TGIF is a symptom.\n\nNot a personality."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17919897141495229"
+    ],
+    "date": "2026-11-20",
+    "slot": "2026-11-20 12:30",
+    "posted_at": "2026-11-20T13:02-05:00"
   }
 ]
