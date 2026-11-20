@@ -4241,5 +4241,17 @@
     "date": "2026-11-20",
     "slot": "2026-11-20 15:30",
     "posted_at": "2026-11-20T15:58-05:00"
+  },
+  {
+    "parts": [
+      "Your company sells what you know.\n\nYou get a salary. They get the margin."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18101995118422673"
+    ],
+    "date": "2026-11-20",
+    "slot": "2026-11-20 17:00",
+    "posted_at": "2026-11-20T17:56-05:00"
   }
 ]
