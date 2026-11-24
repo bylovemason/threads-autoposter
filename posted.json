@@ -4585,5 +4585,29 @@
     "date": "2026-11-23",
     "slot": "2026-11-23 14:00",
     "posted_at": "2026-11-23T21:59-05:00"
+  },
+  {
+    "parts": [
+      "912 hours left in 2026.\n\nThat's enough to build one product.\n\nIt's not enough to keep waiting."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18128295787898695"
+    ],
+    "date": "2026-11-24",
+    "slot": "2026-11-23 15:30",
+    "posted_at": "2026-11-24T08:38-05:00"
+  },
+  {
+    "parts": [
+      "Every side hustle I failed at started with \"learn this new skill.\"\n\nThe one that worked started with \"use what you already know.\""
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17999548599022205"
+    ],
+    "date": "2026-11-24",
+    "slot": "2026-11-23 17:00",
+    "posted_at": "2026-11-24T08:40-05:00"
   }
 ]
