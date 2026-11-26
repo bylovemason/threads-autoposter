@@ -5,7 +5,7 @@ Posts to Threads through Meta's official API from GitHub's free servers, even wh
 ## How it works
 
 - `queue.json` holds upcoming posts. Each item has an `at` time (New York time) and is either a single post (`text`) or a thread (`thread`: a list of parts, posted as replies under the first one).
-- Every 30 minutes between 10am and midnight New York time, GitHub runs `post.py`. Anything whose time has passed is published and moved to `posted.json`. If GitHub runs late, it catches up one extra item per run.
+- A few times a day GitHub starts a long run that stays awake (up to ~5h45m) between 10am and midnight New York time, checking every 4 minutes and publishing anything whose time has passed. Published items move to `posted.json`. Extra start times are backups in case GitHub drops one.
 - Every Monday, `refresh-token.yml` renews the Threads token so it never expires.
 
 ## Settings

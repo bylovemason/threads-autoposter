@@ -2,9 +2,14 @@ name: Post to Threads
 
 on:
   schedule:
-    # Every 30 minutes (at :17 and :47) from 15:00 to 04:59 UTC,
-    # which covers 10am-11:59pm New York time (US only; Asia is asleep).
-    - cron: "17,47 0-4,15-23 * * *"
+    # GitHub often runs scheduled jobs late or drops them, so instead of one
+    # short run every 30 minutes, a few long runs each stay awake for up to
+    # ~5h45m and post every item the moment it's due. 15:00-04:59 UTC covers
+    # 10am-11:59pm New York time (US only). Extra triggers are backups.
+    - cron: "41 14 * * *"
+    - cron: "41 19 * * *"
+    - cron: "41 0 * * *"
+    - cron: "11 3,17,22 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -21,7 +26,7 @@ concurrency:
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -29,23 +34,33 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Publish next post if one is due
+      - name: Post due items until this run's time is up
         env:
           THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
           FORCE_POST: ${{ github.event.inputs.force == 'yes' && '1' || '0' }}
-        run: python post.py
-
-      - name: Save queue changes
-        if: always()
         run: |
-          if [ -n "$(git status --porcelain queue.json posted.json)" ]; then
-            git config user.name "threads-autoposter"
-            git config user.email "actions@users.noreply.github.com"
-            git add queue.json posted.json
-            git commit -m "Posted to Threads"
-            for i in 1 2 3 4 5; do
-              git pull --rebase && git push && exit 0
-              echo "Push failed, retrying in 20s ($i/5)"; sleep 20
-            done
-            exit 1
-          fi
+          git config user.name "threads-autoposter"
+          git config user.email "actions@users.noreply.github.com"
+          save() {
+            if [ -n "$(git status --porcelain queue.json posted.json)" ]; then
+              git add queue.json posted.json
+              git commit -q -m "Posted to Threads"
+              for i in 1 2 3 4 5; do
+                git pull -q --rebase && git push -q && return 0
+                echo "Push failed, retrying in 20s ($i/5)"; sleep 20
+              done
+              return 1
+            fi
+          }
+          if [ "$FORCE_POST" = "1" ]; then python post.py; save; exit $?; fi
+          start=$(date +%s)
+          while [ $(( $(date +%s) - start )) -lt 20400 ]; do
+            h=$((10#$(date -u +%H)))
+            if [ $h -ge 5 ] && [ $h -lt 14 ]; then echo "Outside US posting hours. Done."; break; fi
+            if [ $h -eq 14 ]; then sleep 240; continue; fi
+            git pull -q --rebase || true
+            python post.py || echo "::warning::post.py reported a problem (see above)."
+            save || echo "::error::Could not save queue changes."
+            [ "$(python -c 'import json;print(len(json.load(open("queue.json"))))')" = "0" ] && { echo "Queue empty."; break; }
+            sleep 240
+          done
