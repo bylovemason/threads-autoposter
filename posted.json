@@ -4703,5 +4703,29 @@
     "date": "2026-11-25",
     "slot": "2026-11-24 14:00",
     "posted_at": "2026-11-25T18:41-05:00"
+  },
+  {
+    "parts": [
+      "Your job will replace you in a week if it has to.\n\nPlan accordingly."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "17969021867983730"
+    ],
+    "date": "2026-11-26",
+    "slot": "2026-11-24 15:30",
+    "posted_at": "2026-11-26T00:31-05:00"
+  },
+  {
+    "parts": [
+      "Nobody is coming to save you.\n\nNot your boss. Not HR. Not a raise.\n\nYou build your own way out."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18124231333975771"
+    ],
+    "date": "2026-11-26",
+    "slot": "2026-11-24 17:00",
+    "posted_at": "2026-11-26T00:32-05:00"
   }
 ]
