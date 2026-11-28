@@ -4843,5 +4843,17 @@
     "date": "2026-11-27",
     "slot": "2026-11-27 19:30",
     "posted_at": "2026-11-27T19:31-05:00"
+  },
+  {
+    "parts": [
+      "Your job pays you for 8 hours.\n\nYour experience could pay you while you sleep."
+    ],
+    "status": "posted",
+    "threads_ids": [
+      "18124171589001758"
+    ],
+    "date": "2026-11-27",
+    "slot": "2026-11-27 20:30",
+    "posted_at": "2026-11-27T20:34-05:00"
   }
 ]
